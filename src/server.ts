@@ -1,20 +1,11 @@
-import http, {
-  type IncomingMessage,
-  type ServerResponse,
-} from "http";
-
+import http, { type IncomingMessage, type ServerResponse } from "http";
 import type { Item } from "./models/item.js";
 
 const PORT = 3000;
-
 const items: Item[] = [];
-
 let nextId = 1;
 
-const requestListener = (
-  req: IncomingMessage,
-  res: ServerResponse,
-) => {
+const requestListener = (req: IncomingMessage, res: ServerResponse) => {
   // GET /items
   if (req.method === "GET" && req.url === "/items") {
     res.writeHead(200, {
