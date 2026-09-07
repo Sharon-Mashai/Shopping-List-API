@@ -1,4 +1,8 @@
-import http, { type IncomingMessage, type ServerResponse } from "http";
+import http, {
+  type IncomingMessage,
+  type ServerResponse,
+} from "http";
+
 import type { Item } from "./models/item.js";
 
 const PORT = 3000;
@@ -7,7 +11,10 @@ const items: Item[] = [];
 
 let nextId = 1;
 
-const requestListener = (req: IncomingMessage, res: ServerResponse) => {
+const requestListener = (
+  req: IncomingMessage,
+  res: ServerResponse,
+) => {
   // GET /items
   if (req.method === "GET" && req.url === "/items") {
     res.writeHead(200, {
@@ -15,7 +22,34 @@ const requestListener = (req: IncomingMessage, res: ServerResponse) => {
     });
 
     res.end(JSON.stringify(items));
+    return;
+  }
 
+  // GET /items/:id
+  if (req.method === "GET" && req.url?.startsWith("/items/")) {
+    const id = Number(req.url.split("/")[2]);
+
+    const item = items.find((item) => item.id === id);
+
+    if (!item) {
+      res.writeHead(404, {
+        "Content-Type": "application/json",
+      });
+
+      res.end(
+        JSON.stringify({
+          message: "Item not found",
+        }),
+      );
+
+      return;
+    }
+
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+    });
+
+    res.end(JSON.stringify(item));
     return;
   }
 
