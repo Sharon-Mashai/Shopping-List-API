@@ -16,7 +16,7 @@ const requestListener = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  // GET /items/:id
+  // GET /items by id
   if (req.method === "GET" && req.url?.startsWith("/items/")) {
     const id = Number(req.url.split("/")[2]);
 
@@ -43,6 +43,78 @@ const requestListener = (req: IncomingMessage, res: ServerResponse) => {
     res.end(JSON.stringify(item));
     return;
   }
+
+  // PUT /items by id
+if (req.method === "PUT" && req.url?.startsWith("/items/")) {
+  const id = Number(req.url.split("/")[2]);
+
+  const item = items.find((item) => item.id === id);
+
+  if (!item) {
+    res.writeHead(404, {
+      "Content-Type": "application/json",
+    });
+
+    res.end(
+      JSON.stringify({
+        message: "Item not found",
+      }),
+    );
+
+    return;
+  }
+
+  let body = "";
+
+  req.on("data", (chunk) => {
+    body += chunk.toString();
+  });
+
+  req.on("end", () => {
+    try {
+      const data = JSON.parse(body);
+
+      if (!data.name || !data.quantity) {
+        res.writeHead(400, {
+          "Content-Type": "application/json",
+        });
+
+        res.end(
+          JSON.stringify({
+            message: "Name and quantity are required",
+          }),
+        );
+
+        return;
+      }
+
+      item.name = data.name;
+      item.quantity = data.quantity;
+
+      if (typeof data.purchased === "boolean") {
+        item.purchased = data.purchased;
+      }
+
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+
+      res.end(JSON.stringify(item));
+    } catch {
+      res.writeHead(400, {
+        "Content-Type": "application/json",
+      });
+
+      res.end(
+        JSON.stringify({
+          message: "Invalid JSON",
+        }),
+      );
+    }
+  });
+
+  return;
+}
 
   // POST /items
   if (req.method === "POST" && req.url === "/items") {
