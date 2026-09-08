@@ -1,12 +1,12 @@
 import http, { type IncomingMessage, type ServerResponse } from "http";
 import type { Item } from "./models/item.js";
 
-const PORT = 3000;
+const PORT = 4000;
 const items: Item[] = [];
 let nextId = 1;
 
 const requestListener = (req: IncomingMessage, res: ServerResponse) => {
-  // GET /items
+  // GET items
   if (req.method === "GET" && req.url === "/items") {
     res.writeHead(200, {
       "Content-Type": "application/json",
@@ -16,7 +16,7 @@ const requestListener = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  // GET /items by id
+  // GET items by id
   if (req.method === "GET" && req.url?.startsWith("/items/")) {
     const id = Number(req.url.split("/")[2]);
 
@@ -44,7 +44,7 @@ const requestListener = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  // PUT /items by id
+  // PUT items by id
 if (req.method === "PUT" && req.url?.startsWith("/items/")) {
   const id = Number(req.url.split("/")[2]);
 
@@ -115,7 +115,7 @@ if (req.method === "PUT" && req.url?.startsWith("/items/")) {
   return;
 }
 
-  // POST /items
+  // POST items
   if (req.method === "POST" && req.url === "/items") {
     let body = "";
 
@@ -172,6 +172,35 @@ if (req.method === "PUT" && req.url?.startsWith("/items/")) {
 
     return;
   }
+
+  // DELETE items by id
+if (req.method === "DELETE" && req.url?.startsWith("/items/")) {
+  const id = Number(req.url.split("/")[2]);
+
+  const itemIndex = items.findIndex((item) => item.id === id);
+
+  if (itemIndex === -1) {
+    res.writeHead(404, {
+      "Content-Type": "application/json",
+    });
+
+    res.end(
+      JSON.stringify({
+        message: "Item not found",
+      }),
+    );
+
+    return;
+  }
+
+  items.splice(itemIndex, 1);
+
+  res.writeHead(204);
+
+  res.end();
+
+  return;
+}
 
   // Route not found
   res.writeHead(404, {
