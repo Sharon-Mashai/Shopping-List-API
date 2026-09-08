@@ -14,7 +14,7 @@ export const itemRoutes = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  // Check routes that contain an item ID
+ 
   if (req.url?.startsWith("/items/")) {
     const id = Number(req.url.split("/")[2]);
 
