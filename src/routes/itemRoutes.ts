@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import { getItems, getItemById, createItem, updateItem, deleteItem,} from "../controllers/itemController.js";
+import { sendError } from "../utils/sendError.js";
 
 export const itemRoutes = (req: IncomingMessage, res: ServerResponse) => {
   // GET /items
@@ -14,7 +15,7 @@ export const itemRoutes = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
- 
+  // Routes that contain an item ID
   if (req.url?.startsWith("/items/")) {
     const id = Number(req.url.split("/")[2]);
 
@@ -38,16 +39,5 @@ export const itemRoutes = (req: IncomingMessage, res: ServerResponse) => {
   }
 
   // Route not found
-  res.writeHead(404, {
-    "Content-Type": "application/json",
-  });
-
-  res.end(
-    JSON.stringify({
-      error: {
-        status: 404,
-        message: "Route not found",
-      },
-    }),
-  );
+  sendError(res, 404, "Route not found");
 };

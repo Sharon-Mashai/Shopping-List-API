@@ -1,30 +1,11 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Item } from "../types/item.js";
+import { sendError } from "../utils/sendError.js";
+
 
 const items: Item[] = [];
 
-
 let nextId = 1;
-
-// Reusable error handler
-const sendError = (
-  res: ServerResponse,
-  statusCode: number,
-  message: string,
-) => {
-  res.writeHead(statusCode, {
-    "Content-Type": "application/json",
-  });
-
-  res.end(
-    JSON.stringify({
-      error: {
-        status: statusCode,
-        message: message,
-      },
-    }),
-  );
-};
 
 // Get all shopping items
 export const getItems = (res: ServerResponse) => {
@@ -51,8 +32,7 @@ export const getItemById = (res: ServerResponse, id: number) => {
   res.end(JSON.stringify(item));
 };
 
-
-// Creates a new shopping item
+// Create a new shopping item
 export const createItem = (req: IncomingMessage, res: ServerResponse) => {
   let body = "";
 
@@ -60,12 +40,11 @@ export const createItem = (req: IncomingMessage, res: ServerResponse) => {
     body += chunk.toString();
   });
 
-  
   req.on("end", () => {
     try {
       const data = JSON.parse(body);
 
-      
+    
       if (
         typeof data.name !== "string" ||
         data.name.trim() === "" ||
@@ -88,7 +67,6 @@ export const createItem = (req: IncomingMessage, res: ServerResponse) => {
         purchased: false,
       };
 
-
       nextId++;
 
       items.push(newItem);
@@ -104,8 +82,7 @@ export const createItem = (req: IncomingMessage, res: ServerResponse) => {
   });
 };
 
-
-// Updates an existing shopping item
+// Update an existing shopping item
 export const updateItem = (
   req: IncomingMessage,
   res: ServerResponse,
@@ -124,7 +101,6 @@ export const updateItem = (
     body += chunk.toString();
   });
 
- 
   req.on("end", () => {
     try {
       const data = JSON.parse(body);
@@ -148,7 +124,7 @@ export const updateItem = (
       item.name = data.name;
       item.quantity = data.quantity;
 
-
+    
       if (typeof data.purchased === "boolean") {
         item.purchased = data.purchased;
       }
@@ -172,7 +148,6 @@ export const deleteItem = (res: ServerResponse, id: number) => {
     sendError(res, 404, "Item not found");
     return;
   }
-
 
   items.splice(itemIndex, 1);
 
