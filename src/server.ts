@@ -51,8 +51,7 @@ if (req.method === "PUT" && req.url?.startsWith("/items/")) {
   const item = items.find((item) => item.id === id);
 
   if (!item) {
-    res.writeHead(404, {
-      "Content-Type": "application/json",
+    res.writeHead(404, {"Content-Type": "application/json",
     });
 
     res.end(
